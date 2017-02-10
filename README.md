@@ -6,7 +6,7 @@
 ## Overview:
 The 2D-3D-S dataset provides a variety of mutually registered modalities from 2D, 2.5D and 3D domains, with instance-level semantic and geometric annotations. It covers over 6,000 m2 collected in 6 large-scale indoor areas that originate from 3 different buildings. It contains over 70,000 RGB images, along with the corresponding depths, surface normals, semantic annotations, global XYZ images (all in forms of both regular and 360° equirectangular images) as well as camera information. It also includes registered raw and semantically annotated 3D meshes and point clouds. The dataset enables development of joint and cross-modal learning models and potentially unsupervised approaches utilizing the regularities present in large-scale indoor spaces.
 
-This repo provides a set of tools for interacting with the dataset as well as technical information not necessarily included on the project site. For more information on the dataset, visit the [[project site]](http://3Dsemantics.stanford.edu) or the [[dataset wiki]](https://github.com/alexsax/2D-3D-Semantics/wiki/2D-3D-Semantics-Dataset). 
+This repo provides a set of tools for interacting with the dataset as well as technical information not necessarily included on the project site. For more information on the dataset, visit the [[project site]](http://3Dsemantics.stanford.edu) or the [[dataset wiki]](https://github.com/alexsax/2D-3D-Semantics/wiki). 
 
 
 ## Download

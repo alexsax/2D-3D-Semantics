@@ -6,37 +6,32 @@
 ## Overview:
 The 2D-3D-S dataset provides a variety of mutually registered modalities from 2D, 2.5D and 3D domains, with instance-level semantic and geometric annotations. It covers over 6,000 m2 collected in 6 large-scale indoor areas that originate from 3 different buildings. It contains over 70,000 RGB images, along with the corresponding depths, surface normals, semantic annotations, global XYZ images (all in forms of both regular and 360° equirectangular images) as well as camera information. It also includes registered raw and semantically annotated 3D meshes and point clouds. The dataset enables development of joint and cross-modal learning models and potentially unsupervised approaches utilizing the regularities present in large-scale indoor spaces.
 
-This repo provides a set of tools for interacting with the dataset as well as technical information not necessarily included on the project site. For more information on the dataset, visit the [[project site]](http://3Dsemantics.stanford.edu) or the [[dataset wiki]](https://github.com/alexsax/2D-3D-Semantics/wiki). 
+This repo provides a [set of tools](https://github.com/alexsax/2D-3D-Semantics/blob/master/README.md#tools) for interacting with the dataset as well as technical information not necessarily included on the project site. For more information on the dataset, visit the [[project site]](http://3Dsemantics.stanford.edu) or the [[dataset wiki]](https://github.com/alexsax/2D-3D-Semantics/wiki). 
 
 
 ## Download
 The link will first take you to a license agreement, and then to the data.
 
-###[[ Download the full 2D-3D-S Dataset ]](https://goo.gl/forms/2YSPaO2UKmn5Td5m2)  [[ checksums ]](https://github.com/alexsax/2D-3D-Semantics/wiki/Checksum-Values-for-Data)
+### [[ Download the full 2D-3D-S Dataset ]](https://goo.gl/forms/2YSPaO2UKmn5Td5m2)  [[ checksums ]](https://github.com/alexsax/2D-3D-Semantics/wiki/Checksum-Values-for-Data)
 
 The full dataset is very large at 766G. Therefore, we have split the data by area to accomodate a la carte data selection. The dataset also comes in two flavors: with global_xyz images (766G) and without (110G). Once you click on the download link and accept the license agreement, the variants are accessible from in the `withXYZ` and `noXYZ` folders, respectively. 
 
 
-####License Note: The dataset license is included in the above link. The license in this repository covers only the provided software.
+#### License Note: The dataset license is included in the above link. The license in this repository covers only the provided software.
 
 
 
 ### Citations
 If you use this dataset please cite:
-@ARTICLE{2017arXiv170201105A,
-   author = {{Armeni}, I. and {Sax}, S. and {Zamir}, A.~R. and {Savarese}, S.
-	},
-    title = "{Joint 2D-3D-Semantic Data for Indoor Scene Understanding}",
-  journal = {ArXiv e-prints},
-archivePrefix = "arXiv",
-   eprint = {1702.01105},
- primaryClass = "cs.CV",
- keywords = {Computer Science - Computer Vision and Pattern Recognition, Computer Science - Robotics},
-     year = 2017,
-    month = feb,
-   adsurl = {http://adsabs.harvard.edu/abs/2017arXiv170201105A},
-  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+```
+@article{armeni2017joint,
+  title={Joint 2d-3d-semantic data for indoor scene understanding},
+  author={Armeni, Iro and Sax, Sasha and Zamir, Amir R and Savarese, Silvio},
+  journal={arXiv preprint arXiv:1702.01105},
+  year={2017}
 }
+```
+
 
 ## Dataset Modalities
 Each physical area in the dataset has its own folder in the dataset. All the modalities and metadata for each area are contained in that folder. In addition, `/assets` contains some global metadata and utilities in Python. The utilities are in `/assets/utils.py` and contain functions for reading EXRs and parsing labels.
@@ -49,7 +44,7 @@ README.md
 /area_1
   /3d
     pointcloud.mat
-    rgb.obj  	 # The raw 3d mesh with rgb textures
+    rgb.obj    # The raw 3d mesh with rgb textures
     rgb.mtl      # The textures for the raw 3d mesh
     semantic.obj # Semantically-tagged 3d mesh
     semantic.mtl # Tectures for semantic.obj
@@ -74,6 +69,11 @@ README.md
     /normal
     /semantic
     /semantic_pretty
+  /raw     # Raw data from Matterport
+    {uuid}_pose_{pitch_level}_{yaw_position}.txt # RT matrix for raw sensor
+    {uuid}_intrinsics_{pitch_level}.txt      # Camera calibration for sensor at {pitch_level}
+    {uuid}_i{pitch_level}_{yaw_position}.jpg # Raw RGB image from sensor
+    {uuid}_d{pitch_level}_{yaw_position}.jpg # Raw depth image form sensor
 /area_2
 /area_3
 /area_4
@@ -88,27 +88,27 @@ The dataset contains colored point clouds and textured meshes for each scanned a
 **3D Point Cloud:** The raw colored 3D point clouds along with both object and scene instance-level annotations per point, (tightest) axis-aligned bounding boxes and voxels with binary occupancy and point correpsondence are stored in the Area_#_PointCloud.mat file. The variables are stored in the form of nested structs:
 ```
 - Area: --> name: the area name as: Area_#
-		--> Disjoint-Space: struct with information on the individual spaces in the buidling.
+    --> Disjoint-Space: struct with information on the individual spaces in the buidling.
 ```
 
 In each *Disjoint_Space* struct:
 ```
-- Disjoint_Space:	--> name: the name of that space, with per area global index (e.g. conferenceRoom_1, offie_13, etc.)
-					-->AlignmentAngle: rotation angle around Z axis, to align spaces based on the CVPR2016 paper *3D Semantic Parsing of Large-Scale Indoor Spaces*. 
-					--> color: a unique RGB color value [0,1] for that room, mainly for visualization purposes
-					--> object: a struct that contains all objects in that space.
+- Disjoint_Space: --> name: the name of that space, with per area global index (e.g. conferenceRoom_1, offie_13, etc.)
+          -->AlignmentAngle: rotation angle around Z axis, to align spaces based on the CVPR2016 paper *3D Semantic Parsing of Large-Scale Indoor Spaces*. 
+          --> color: a unique RGB color value [0,1] for that room, mainly for visualization purposes
+          --> object: a struct that contains all objects in that space.
 ```
 
 In each *object* struct:
 ```
-- object:	--> name: the name of the object, wiith per space indexing* (e.g. chair-1, wall_3, clutter_13, etc.)
-			--> points: the X,Y,Z coordinates of the 3D points that comprise this object
-			--> RGB_color: the raw RGB color value [0,255] associated with each point.
-			--> global_name: the name of the object, with per area global index**
-			--> Bbox: [Xmin Xmax Ymin Ymax Zmin Zmax] of the object's boudning box
-			--> Voxels: [Xmin Xmax Ymin Ymax Zmin Zmax] for each voxel in a 6x6x6 grid
-			--> Voxel_Occupancy: binary occupancy per voxel (0: empty, 1: contains points)
-			--> Points_per_Voxel: the object points that correspond to each voxel (in XYZ coordinates)
+- object: --> name: the name of the object, wiith per space indexing* (e.g. chair-1, wall_3, clutter_13, etc.)
+      --> points: the X,Y,Z coordinates of the 3D points that comprise this object
+      --> RGB_color: the raw RGB color value [0,255] associated with each point.
+      --> global_name: the name of the object, with per area global index**
+      --> Bbox: [Xmin Ymin Zmin Xmax Ymax Zmax] of the object's boudning box
+      --> Voxels: [Xmin Ymin Zmin Xmax Ymax Zmax] for each voxel in a 6x6x6 grid
+      --> Voxel_Occupancy: binary occupancy per voxel (0: empty, 1: contains points)
+      --> Points_per_Voxel: the object points that correspond to each voxel (in XYZ coordinates)
 ```
 
 **3D Semantic mesh:**  
@@ -161,7 +161,20 @@ Global XYZ images contain the ground-truth location of each pixel in the mesh. T
 **Normal:**
 Normals are 127.5-centered per-channel surface normal images. For panoramic images, these normals are relative to the global corodinate system. Since the global coordinate system is impossible to determine from a sampled image, the `normal` images in `/data` have their normals defined relative to the direction the camera is facing. The normals axis-color convention is the same one used by NYU RGB-D. Areas where the mesh is missing have pixel color #808080. 
 
+
 **Semantic:**
 Semantic images come in two variants, `semantic` and `semantic_pretty`. They both include information from the point cloud annotations, but only the `semantic` version should be used for learning. The `semantic` images have RGB images which are direct 24-bit base-256 integers which contain an index into `/assets/semantic_labels.json`. Pixels where the data is missing are encoded with the color #0D0D0D which is larger than the `len( labels )`.
 
+### Raw Sensor data:
+The raw data from the Matterport sensors is also included in the `raw` folder. The Matterport camera contains 3 sensors at different pitches, and rotates 60 degrees at a time to complete a 360-degree sweep. We make available both the raw RGB images and also the raw depth images which can be stitched together to make a mesh, or else used independently. 
 
+## Tools
+This repository provides some basic tools for interacting with the dataset. Pull requests are welcome! 
+
+The tools are located in the `assets/` folder and reside in two files. 
+
+**utils.py (Python)**
+This file contains Python tools, and in general it is useful for working with images. It provides convenience functions for loading semantic labels, and reading the ground-truth label from an image pixel. It also provides a toolkit to work with .exr files.
+
+**pcl_utils.h (C++)**
+This file contains C++ tools, and in general it is useful for working with the .obj files and point clouds. It provides convenience functions for loading 6DOF camera poses.
